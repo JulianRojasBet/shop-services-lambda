@@ -9,14 +9,23 @@ export const getProductsById = async (event: Event) => {
     ({ id }: Product) => id === productId
   );
 
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "OPTIONS,GET",
+  },
+
   if (!product) {
     return {
+      headers,
       statusCode: 404,
       body: JSON.stringify({ error: "Product not found" })
     };
   }
 
   return {
+    headers,
     statusCode: 200,
     body: JSON.stringify({ ...product }),
   };

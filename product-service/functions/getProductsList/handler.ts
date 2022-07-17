@@ -1,7 +1,6 @@
 import products from "mocks/products.json";
 
 export const getProductsList = async () => {
-  console.log("getProductsList");
   return {
     statusCode: 200,
     headers: {
