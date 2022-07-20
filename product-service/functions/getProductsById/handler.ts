@@ -14,13 +14,15 @@ export const getProductsById = async (event: Event) => {
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "OPTIONS,GET",
-  },
+  };
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   if (!product) {
     return {
       headers,
       statusCode: 404,
-      body: JSON.stringify({ error: "Product not found" })
+      body: JSON.stringify({ error: "Product not found" }),
     };
   }
 
