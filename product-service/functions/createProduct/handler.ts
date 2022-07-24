@@ -13,6 +13,14 @@ export const createProduct = async (event: Event) => {
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
   };
 
+  if (!id || !title || !description) {
+    return {
+      headers,
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Bad request' }),
+    };
+  }
+
   try {
     const [product, stock] = await sql.begin(async (sql) => {
       const [product] = await sql`
