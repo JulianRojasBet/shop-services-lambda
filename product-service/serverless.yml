@@ -47,6 +47,12 @@ functions:
       - httpApi:
           path: /products
           method: get
+  createProduct:
+    handler: functions/createProduct/handler.createProduct
+    events:
+      - httpApi:
+          path: /products
+          method: post
   getProductsById:
     handler: functions/getProductsById/handler.getProductsById
     events:
