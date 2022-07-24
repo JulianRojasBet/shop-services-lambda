@@ -7,16 +7,13 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.json'],
     alias: {
-      mocks: path.resolve(__dirname, './mocks/')
+      mocks: path.resolve(__dirname, './mocks/'),
+      database: path.resolve(__dirname, './database/'),
     }
   },
   target: 'node',
   module: {
     rules: [
-      // {
-      //   test: /\.(json)$/,
-      //   type: 'asset/source'
-      // },
       {
         test: /\.(ts)$/,
         loader: 'ts-loader',

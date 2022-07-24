@@ -14,7 +14,8 @@
     "paths": {
       "functions/*": ["./functions/*"],
       "types/*": ["./types/*"],
-      "mocks/*": ["./mocks/*"]
+      "mocks/*": ["./mocks/*"],
+      "database/*": ["./database/*"]
     }
   }
 }
