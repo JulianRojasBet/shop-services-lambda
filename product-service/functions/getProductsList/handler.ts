@@ -26,7 +26,5 @@ export const getProductsList = async () => {
       headers,
       body: JSON.stringify({ error: "Internal server error" }),
     };
-  } finally {
-    sql.end();
   }
 };

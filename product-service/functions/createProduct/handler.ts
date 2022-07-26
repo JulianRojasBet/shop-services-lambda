@@ -46,7 +46,5 @@ export const createProduct = async (event: Event) => {
       headers,
       body: JSON.stringify({ error: "Internal server error" }),
     };
-  } finally {
-    sql.end();
   }
 };
