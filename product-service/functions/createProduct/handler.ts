@@ -13,7 +13,7 @@ export const createProduct = async (event: Event) => {
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
   };
 
-  if (!title || !description) {
+  if (!title || !description || !price || !count) {
     return {
       headers,
       statusCode: 400,
