@@ -1,11 +1,12 @@
 import { sql } from "database";
-import { Product } from "types/Product";
 
-type Event = Product & { count: number } ;
+type Event = { body: string } ;
 
 export const createProduct = async (event: Event) => {
-  const { title, description, price, count } = event || {};
-  console.log('new createProduct request with:', event);
+  const buffer = Buffer.from(event.body, 'base64');
+  const body = buffer.toString('ascii');
+  const { title, description, price, count } = JSON.parse(body) || {};
+  console.log('new createProduct request with:', JSON.parse(body));
   const headers = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Headers": "Content-Type",
