@@ -1,11 +1,11 @@
 import { sql } from "database";
 import { Product } from "types/Product";
 
-type Event = { body: Product & { count: number } };
+type Event = Product & { count: number } ;
 
 export const createProduct = async (event: Event) => {
-  const { id, title, description, price, count } = event.body || {};
-  console.log('new createProduct request with:', event.body);
+  const { title, description, price, count } = event || {};
+  console.log('new createProduct request with:', event);
   const headers = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -13,7 +13,7 @@ export const createProduct = async (event: Event) => {
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
   };
 
-  if (!id || !title || !description) {
+  if (!title || !description) {
     return {
       headers,
       statusCode: 400,
@@ -24,8 +24,8 @@ export const createProduct = async (event: Event) => {
   try {
     const [product, stock] = await sql.begin(async (sql) => {
       const [product] = await sql`
-        INSERT INTO product (id, title, description, price)
-        VALUES (${id}, ${title}, ${description}, ${price}) RETURNING *;
+        INSERT INTO product (title, description, price)
+        VALUES (${title}, ${description}, ${price}) RETURNING *;
       `;
       const [stock] = await sql`
         INSERT INTO stock (product_id, count)
