@@ -1,0 +1,11 @@
+# package directories
+**/.webpack
+**/node_modules
+**/jspm_packages
+
+# Serverless directories
+**/.serverless
+
+# Others
+**/.env
+**/.todo

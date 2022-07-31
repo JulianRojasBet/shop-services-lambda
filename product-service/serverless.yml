@@ -33,6 +33,8 @@ provider:
   name: aws
   runtime: nodejs16.x
   region: us-east-1
+  profile: serverless
+  
   environment:
     PGUSER: ${env:PGUSER}
     PGHOST: ${env:PGHOST}
