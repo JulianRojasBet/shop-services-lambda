@@ -1,4 +1,4 @@
-import { parse } from "csv-parse";
+import Converter from "csvtojson";
 import { S3Event } from "aws-lambda";
 import {
   S3Client,
@@ -6,7 +6,13 @@ import {
   CopyObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import { BUCKET_NAME, UPLOAD_FOLDER_NAME, PARSE_FOLDER_NAME } from "constants/index";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+import {
+  BUCKET_NAME,
+  UPLOAD_FOLDER_NAME,
+  PARSE_FOLDER_NAME,
+} from "constants/index";
 
 export const importFileParser = async ({ Records }: S3Event) => {
   console.log("new importFileParser request");
@@ -18,6 +24,7 @@ export const importFileParser = async ({ Records }: S3Event) => {
   };
 
   const s3 = new S3Client({ region: "us-east-1" });
+  const sqs = new SQSClient({ region: "us-east-1" });
 
   try {
     await Promise.all(
@@ -31,13 +38,19 @@ export const importFileParser = async ({ Records }: S3Event) => {
         const getObjectCommand = new GetObjectCommand(getParams);
         const getObjectOutput = await s3.send(getObjectCommand);
         const stream = getObjectOutput.Body;
-
-        await new Promise((resolve, reject) => {
-          stream.pipe(parse());
-          stream.on("data", (chunk: any) => console.log(JSON.stringify(chunk)));
-          stream.on("error", reject);
-          stream.on("end", resolve);
-        });
+        const converter = Converter()
+        converter
+          .fromStream(stream)
+          .on("data", async (chunk) => {
+            const buffer = Buffer.from(chunk);
+            const product = JSON.parse(buffer.toString());
+            const params = {
+              MessageBody: JSON.stringify(product),
+              QueueUrl: `${process.env.SQS_URL}`,
+            };
+            const sendMessageCommandOutput = new SendMessageCommand(params);
+            await sqs.send(sendMessageCommandOutput);
+          });
 
         const copyParams = {
           Bucket: BUCKET_NAME,

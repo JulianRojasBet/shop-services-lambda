@@ -41,6 +41,23 @@ provider:
     PGPASSWORD: ${env:PGPASSWORD}
     PGDATABASE: ${env:PGDATABASE}
     PGPORT: ${env:PGPORT}
+    SNS_TOPIC:
+      Ref: createProductTopic
+  
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sqs:*"
+          Resource:
+            - Fn::GetAtt: [catalogItemsQueue, Arn]
+
+        - Effect: "Allow"
+          Action:
+            - "sns:*"
+          Resource:
+            Ref: createProductTopic
 
 functions:
   getProductsList:
@@ -49,15 +66,58 @@ functions:
       - httpApi:
           path: /products
           method: get
+
   createProduct:
     handler: functions/createProduct/handler.createProduct
     events:
       - httpApi:
           path: /products
           method: post
+
   getProductsById:
     handler: functions/getProductsById/handler.getProductsById
     events:
       - httpApi:
           path: /products/{productId}
           method: get
+
+  catalogBatchProcess:
+    handler: functions/catalogBatchProcess/handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn: 
+            Fn::GetAtt: [catalogItemsQueue, Arn]
+          batchSize: 5
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: productInserted
+
+    emailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EMAIL}
+        Protocol: email
+        TopicArn:
+          Ref: createProductTopic
+
+  Outputs:
+    catalogItemsQueueUrl:
+      Value:
+        Ref: catalogItemsQueue
+      Export:
+        Name: catalogItemsQueueUrl
+
+    catalogItemsQueueArn:
+      Value:
+        Fn::GetAtt: [catalogItemsQueue, Arn]
+      Export:
+        Name: catalogItemsQueueArn

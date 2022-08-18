@@ -5,7 +5,7 @@ module.exports = {
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,
   resolve: {
-    extensions: ['.ts', '.json'],
+    extensions: ['.ts', '.js', '.json'],
     alias: {
       mocks: path.resolve(__dirname, './mocks/'),
       database: path.resolve(__dirname, './database/'),

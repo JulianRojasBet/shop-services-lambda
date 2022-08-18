@@ -39,6 +39,7 @@ provider:
     BUCKET_NAME: ${env:BUCKET_NAME}
     UPLOAD_FOLDER_NAME: ${env:UPLOAD_FOLDER_NAME}
     PARSE_FOLDER_NAME: ${env:PARSE_FOLDER_NAME}
+    SQS_URL: ${cf:product-service-dev.catalogItemsQueueUrl}
 
   iam:
     role:
@@ -46,13 +47,16 @@ provider:
         # Allow functions to list all buckets
         - Effect: Allow
           Action: 's3:ListBucket'
-          Resource: 'arn:aws:s3:::snorku-store-import-files'
+          Resource: 'arn:aws:s3:::${env:BUCKET_NAME}'
+
         # Allow functions to read/write objects in a bucket
         - Effect: Allow
-          Action:
-            - 's3:*'
-          Resource:
-            - 'arn:aws:s3:::snorku-store-import-files/*'
+          Action: 's3:*'
+          Resource: 'arn:aws:s3:::${env:BUCKET_NAME}/*'
+
+        - Effect: Allow
+          Action: 'sqs:*'
+          Resource: ${cf:product-service-dev.catalogItemsQueueArn}
 
 functions:
   importProductsFile:
@@ -65,12 +69,13 @@ functions:
             parameters:
               querystrings:
                 name: true
+
   importFileParser:
     handler: functions/importFileParser/handler.importFileParser
     events:
       - s3:
-        bucket: snorku-store-import-files
-        event: s3:ObjectCreated:*
-        rules:
-          - prefix: uploaded/
-        existing: true
+          bucket: ${env:BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ${env:UPLOAD_FOLDER_NAME}/
+          existing: true

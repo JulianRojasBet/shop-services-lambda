@@ -5,16 +5,12 @@ module.exports = {
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,
   resolve: {
-    extensions: ['.ts', '.json'],
+    extensions: ['.ts', '.js', '.json'],
     alias: {
       constants: path.resolve(__dirname, './constants/'),
     }
   },
   target: 'node',
-  externals: {
-    'aws-sdk': 'aws-sdk',
-    '@aws-sdk/client-s3': '@aws-sdk/client-s3',
-  },
   module: {
     rules: [
       {
