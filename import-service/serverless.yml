@@ -41,6 +41,15 @@ provider:
     PARSE_FOLDER_NAME: ${env:PARSE_FOLDER_NAME}
     SQS_URL: ${cf:product-service-dev.catalogItemsQueueUrl}
 
+  httpApi:
+    authorizers:
+      basicAuthorizer:
+        type: request
+        functionArn: ${cf:authorization-service-dev.basicAuthorizerArn}
+        payloadVersion: '2.0'
+        enableSimpleResponses: true
+        identitySource: $request.header.Authorization
+
   iam:
     role:
       statements:
@@ -69,6 +78,9 @@ functions:
             parameters:
               querystrings:
                 name: true
+          authorizer:
+            name: basicAuthorizer
+              
 
   importFileParser:
     handler: functions/importFileParser/handler.importFileParser
